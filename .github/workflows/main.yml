@@ -1,0 +1,71 @@
+name: Run monitor_on_github.py and Save Output
+
+on:
+  schedule:
+    - cron: "0 * * * *"  # 每小时执行一次
+  workflow_dispatch:  # 允许手动触发
+  push:
+    branches:
+      - master  # 如果有推送到 master 分支，也会触发
+
+permissions:
+  contents: write  # 允许修改内容
+
+jobs:
+  run_monitor_script:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 1  # 只拉取最新的提交
+
+      # Step 2: Set up Python environment
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # Step 3: Install required dependencies
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # 假设你的依赖项在 requirements.txt 中
+
+      # Step 4: Run the Python script and save output to log file
+      - name: Run Python Script and Save Log
+        run: |
+          export TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}
+          export CHAT_ID=${{ secrets.CHAT_ID }}
+          export PROXY=${{ secrets.PROXY }}
+          python3 launch.py
+
+      # Step 4: Set up Git configuration
+      - name: Setup Git Configuration
+        run: |
+          git config user.email "justcharlzg@outlook.com"
+          git config user.name "justcharlzG"
+
+      # Step 5: Prepare Commit
+      - name: Prepare Commit
+        run: |
+          CURRENT_TIME=$(date +'%Y-%m-%d_%H-%M-%S')
+
+          git add .
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+            exit 0
+          else
+            git commit -m "ido/ieo update at $CURRENT_TIME"
+          fi
+
+      # Step 6: Push Changes to a new branch
+      - name: Push Changes
+        if: success()  # 仅在 commit 成功时推送
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
