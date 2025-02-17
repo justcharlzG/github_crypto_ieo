@@ -26,7 +26,7 @@ DATA = {
     "status": "upcoming"
 }
 
-TARGET_LAUNCHPADS = {"bitget", "binance-launchpad", "okx-jumpstart", "bybit-launchpad", "pancake-swap", "gateio-startup"}
+TARGET_LAUNCHPADS = {"bitget", "binance-launchpad", "okx-jumpstart", "bybit-launchpad", "pancake-swap"}
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHAT_ID = os.getenv('CHAT_ID')

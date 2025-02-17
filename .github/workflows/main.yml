@@ -2,7 +2,7 @@ name: Run monitor_on_github.py and Save Output
 
 on:
   schedule:
-    - cron: "0 * * * *"  # 每小时执行一次
+    - cron: "0 */8 * * *"  # 每 8 小时执行一次
   workflow_dispatch:  # 允许手动触发
   push:
     branches:
